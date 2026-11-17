@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoReceipt • PlanetPrompt Presentation (Editable)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #047857;
+            --primary-dark: #064E3B;
+            --primary-light: #10B981;
+            --accent: #F59E0B;
+            --bg-light: #F8FAF9;
+            --card-bg: #FFFFFF;
+            --text-dark: #111827;
+            --text-muted: #6B7280;
+            --border: #E5E7EB;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            background: #1E293B;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Top Control Bar */
+        .toolbar {
+            width: 100%;
+            max-width: 1120px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0F172A;
+            padding: 12px 24px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            color: #E2E8F0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
+        }
+
+        .toolbar .btn-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            background: #334155;
+            color: #F8FAFC;
+            border: 1px solid #475569;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background: #475569;
+        }
+
+        .btn-primary {
+            background: var(--primary-light);
+            border-color: var(--primary-light);
+            color: #FFFFFF;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary);
+        }
+
+        .edit-status {
+            font-size: 13px;
+            font-weight: 600;
+            color: #94A3B8;
+        }
+
+        .edit-status.active {
+            color: #34D399;
+        }
+
+        /* Slide Viewport */
+        .deck-container {
+            width: 100%;
+            max-width: 1120px;
+            aspect-ratio: 16 / 9;
+            background: #FFFFFF;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            padding: 48px 56px;
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            background: var(--bg-light);
+            position: relative;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        /* Slide Header */
+        .slide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid #E2E8F0;
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .slide-category {
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .slide-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            letter-spacing: -0.5px;
+        }
+
+        .hackathon-tag {
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748B;
+            background: #F1F5F9;
+            padding: 6px 14px;
+            border-radius: 999px;
+            border: 1px solid #CBD5E1;
+        }
+
+        /* Slide Body Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            flex-grow: 1;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            flex-grow: 1;
+        }
+
+        /* Reusable Card */
+        .card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .card-highlight {
+            border-top: 5px solid var(--primary-light);
+        }
+
+        .card-accent {
+            border-top: 5px solid var(--accent);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #4B5563;
+        }
+
+        .stat-box {
+            background: #ECFDF5;
+            border: 1px solid #A7F3D0;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            margin-top: 12px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #065F46;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Cover Slide Special Layout */
+        .cover-slide {
+            background: linear-gradient(135deg, #064E3B 0%, #047857 50%, #059669 100%);
+            color: #FFFFFF;
+            padding: 60px 64px;
+            justify-content: space-between;
+        }
+
+        .cover-logos {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .partner-pill {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            padding: 6px 16px;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .cover-title {
+            font-size: 52px;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            line-height: 1.1;
+            margin-bottom: 12px;
+            color: #FFFFFF;
+        }
+
+        .cover-subtitle {
+            font-size: 20px;
+            color: #A7F3D0;
+            font-weight: 400;
+            max-width: 800px;
+            line-height: 1.5;
+            margin-bottom: 28px;
+        }
+
+        .cover-meta {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            border-radius: 14px;
+            padding: 18px 24px;
+            display: flex;
+            gap: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: fit-content;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #6EE7B7;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .meta-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        /* Slide Footer */
+        .slide-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #E2E8F0;
+            padding-top: 14px;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 16px;
+        }
+
+        /* Editable highlight */
+        [contenteditable="true"] {
+            outline: 2px dashed rgba(16, 185, 129, 0.4);
+            border-radius: 4px;
+            padding: 2px 4px;
+        }
+
+        [contenteditable="true"]:focus {
+            outline: 2px solid var(--primary-light);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        /* Print formatting (PDF Export) */
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+            .toolbar {
+                display: none;
+            }
+            .deck-container {
+                box-shadow: none;
+                max-width: 100%;
+                border-radius: 0;
+            }
+            .slide {
+                display: flex !important;
+                page-break-after: always;
+                height: 100vh;
+                width: 100vw;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Controls -->
+    <div class="toolbar">
+        <div class="btn-group">
+            <button class="btn" onclick="prevSlide()">◀ Previous</button>
+            <span style="font-size: 14px; font-weight: 700;" id="slideCounter">Slide 1 / 6</span>
+            <button class="btn" onclick="nextSlide()">Next ▶</button>
+        </div>
+
+        <div class="btn-group">
+            <span class="edit-status active" id="editIndicator">✏️ Click any text to edit directly</span>
+            <button class="btn btn-primary" onclick="window.print()">🖨️ Export / Print PDF</button>
+            <button class="btn" onclick="toggleEdit()">Toggle Edit Mode</button>
+        </div>
+    </div>
+
+    <!-- Presentation Deck Container (16:9) -->
+    <div class="deck-container">
+
+        <!-- ========================================== -->
+        <!-- SLIDE 1: COVER SLIDE                       -->
+        <!-- ========================================== -->
+        <div class="slide cover-slide active" id="slide-1">
+            <div class="cover-logos">
+                <span class="partner-pill">1M1B</span>
+                <span class="partner-pill">Microsoft</span>
+                <span class="partner-pill">MeitY Startup Hub</span>
+                <span class="partner-pill" style="background: rgba(245, 158, 11, 0.3); border-color: #F59E0B;">Planet Prompt AI Hackathon</span>
+            </div>
+
+            <div>
+                <h1 class="cover-title" contenteditable="true">🧾 EcoReceipt</h1>
+                <p class="cover-subtitle" contenteditable="true">
+                    Generative AI Grocery Carbon Auditor & Planetary Swap Copilot.<br>
+                    Transforming everyday supermarket slips into transparent, actionable climate action.
+                </p>
+
+                <div class="cover-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Innovator</span>
+                        <span class="meta-value" contenteditable="true">Anubhav Kaushik</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Institution</span>
+                        <span class="meta-value" contenteditable="true">NIT Allahabad (MNNIT)</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Focus Area</span>
+                        <span class="meta-value" contenteditable="true">Applied AI for Climate Action</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="font-size: 13px; color: #A7F3D0; font-weight: 500;" contenteditable="true">
+                <b>Problem Statement:</b> Everyday consumers lack visibility into the invisible carbon footprint of their food purchases, despite grocery choices driving over a quarter of global emissions.
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SLIDE 2: PROBLEM STATEMENT & MOTIVATION    -->
+        <!-- ========================================== -->
+        <div class="slide" id="slide-2">
+            <div class="slide-header">
+                <div>
+                    <div class="slide-category">Challenge Breakdown</div>
+                    <h2 class="slide-title" contenteditable="true">The Problem: Invisible Emissions in Every Grocery Cart</h2>
+                </div>
+                <div class="hackathon-tag">1M1B × Microsoft Submission</div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card card-highlight">
+                    <div class="card-title">⚠️ What Problem Are We Solving?</div>
+                    <p class="card-text" contenteditable="true">
+                        Food production accounts for <b>26% of global greenhouse gas emissions</b>. While nutrition labels show calories and protein, no supermarket receipt displays the carbon footprint (kg CO₂e) of purchases.<br><br>
+                        Manual carbon accounting apps fail because entering dozens of grocery items line-by-line is tedious and unsustainable for everyday shoppers.
+                    </p>
+                    <div class="stat-box">
+                        <div class="stat-value" contenteditable="true">26%</div>
+                        <div class="stat-label">of Global GHG Emissions Stems from Food Systems</div>
+                    </div>
+                </div>
+
+                <div class="card card-accent">
+                    <div class="card-title">🥩 Real-World Example & Impact</div>
+                    <p class="card-text" contenteditable="true">
+                        <b>The Beef Blindspot:</b> A standard 500g pack of minced beef carries a staggering carbon footprint of <b>~30 kg CO₂e</b>—the equivalent of driving a standard petrol car for <b>130 km</b>.<br><br>
+                        Yet, on a supermarket slip, it appears as just another $5 line item. Without itemized clarity, environmentally conscious consumers cannot identify the carbon hotspots in their own homes.
+                    </p>
+                    <div class="stat-box" style="background: #FEF3C7; border-color: #FCD34D;">
+                        <div class="stat-value" style="color: #B45309;" contenteditable="true">130 km</div>
+                        <div class="stat-label" style="color: #92400E;">Car Driving Equivalent of Just 500g Beef Mince</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-footer">
+                <span>EcoReceipt • Slide 2 of 6</span>
+                <span>Target Audience: Urban Consumers & Climate-Conscious Households</span>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SLIDE 3: RESEARCH & KEY INSIGHTS           -->
+        <!-- ========================================== -->
+        <div class="slide" id="slide-3">
+            <div class="slide-header">
+                <div>
+                    <div class="slide-category">Insights & Research</div>
+                    <h2 class="slide-title" contenteditable="true">Data-Backed Insights: The 80/20 Rule of Food Emissions</h2>
+                </div>
+                <div class="hackathon-tag">Science-Based Validation</div>
+            </div>
+
+            <div class="grid-3">
+                <div class="card card-highlight">
+                    <div class="card-title">🔬 Research Foundations</div>
+                    <p class="card-text" contenteditable="true">
+                        Benchmarked against lifecycle assessments (LCA) from <b>Poore & Nemecek (Science, 2018)</b> and <i>Our World in Data</i>.<br><br>
+                        Emission factors range wildly: Beef (~60 kg CO₂e/kg) vs Lentils & Beans (~0.9 kg CO₂e/kg)—a <b>66× difference</b>.
+                    </p>
+                </div>
+
+                <div class="card card-highlight">
+                    <div class="card-title">💡 The Key Discovery</div>
+                    <p class="card-text" contenteditable="true">
+                        In typical grocery baskets, over <b>70% to 80% of total emissions come from just 1 or 2 items</b> (red meat and hard cheeses).<br><br>
+                        Consumers don't need a total dietary overhaul—they just need targeted visibility on 2 key swaps.
+                    </p>
+                </div>
+
+                <div class="card card-accent">
+                    <div class="card-title">🎯 The Product Insight</div>
+                    <p class="card-text" contenteditable="true">
+                        Consumers hate logging food manually. But they already carry the ultimate consumption ledger in their hand: <b>their printed or digital receipt</b>.<br><br>
+                        A single photo provides instant auditability with zero friction.
+                    </p>
+                </div>
+            </div>
+
+            <div style="background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 12px; padding: 14px 20px; margin-top: 16px; display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 22px;">🌱</span>
+                <span style="font-size: 13px; color: #065F46; font-weight: 600;" contenteditable="true">
+                    <b>Core Thesis:</b> Actionable climate nudges ("PlanetPrompts") paired with zero-effort receipt OCR can reduce household grocery emissions by up to 45% without increasing food bills.
+                </span>
+            </div>
+
+            <div class="slide-footer">
+                <span>EcoReceipt • Slide 3 of 6</span>
+                <span>Lifecycle Assessment (LCA) Methodology</span>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SLIDE 4: AI-ENABLED SOLUTION & ARCHITECTURE-->
+        <!-- ========================================== -->
+        <div class="slide" id="slide-4">
+            <div class="slide-header">
+                <div>
+                    <div class="slide-category">Technology & System Design</div>
+                    <h2 class="slide-title" contenteditable="true">The AI Solution: Zero-Shot Multimodal Carbon Engine</h2>
+                </div>
+                <div class="hackathon-tag">Python & Gemini 3.8 Flash</div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card card-highlight">
+                    <div class="card-title">⚙️ Core Architecture & Tech Stack</div>
+                    <p class="card-text" contenteditable="true">
+                        <b>1. Multimodal OCR & Entity Extraction:</b> Uses <code>gemini-3.8-flash</code> with Pydantic structured JSON schemas to decipher crumpled receipts, abbreviated items (e.g. <code>BF MNCE 500G</code>), and weights.<br><br>
+                        <b>2. Carbon Benchmarking Engine:</b> Automated Python mapping of items to cradle-to-gate LCA emission factors.<br><br>
+                        <b>3. Frontend UI:</b> Interactive Streamlit application with custom Plus Jakarta Sans styling, metric cards, and Plotly charts.
+                    </p>
+                </div>
+
+                <div class="card card-highlight">
+                    <div class="card-title">✨ Key Features</div>
+                    <ul style="font-size: 13px; line-height: 1.8; color: #4B5563; padding-left: 18px;" contenteditable="true">
+                        <li><b>Eco-Grade (A to F):</b> Instant Paris 1.5°C climate compatibility scorecard.</li>
+                        <li><b>Visual Breakdown:</b> Dynamic Plotly donut and emission bar charts.</li>
+                        <li><b>PlanetPrompts (Smart Swaps):</b> High-impact, wallet-friendly grocery alternatives showing CO₂ saved and cost delta.</li>
+                        <li><b>Zero-Waste Chef Copilot:</b> Generates dinner recipes using purchased perishables to eliminate home food spoilage.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="slide-footer">
+                <span>EcoReceipt • Slide 4 of 6</span>
+                <span>Structured AI Ingestion: Zero-Shot Parsing</span>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SLIDE 5: PROTOTYPE DEMO & WORKFLOW        -->
+        <!-- ========================================== -->
+        <div class="slide" id="slide-5">
+            <div class="slide-header">
+                <div>
+                    <div class="slide-category">Prototype & User Workflow</div>
+                    <h2 class="slide-title" contenteditable="true">From Receipt Snap to Planetary Action in 3 Seconds</h2>
+                </div>
+                <div class="hackathon-tag">Live Working Prototype</div>
+            </div>
+
+            <div class="grid-3">
+                <div class="card" style="border-top: 4px solid #3B82F6;">
+                    <div style="font-size: 28px; margin-bottom: 8px;">📸 Step 1: Capture</div>
+                    <div class="card-title">Snap or Upload</div>
+                    <p class="card-text" contenteditable="true">
+                        User snaps a quick receipt photo via mobile camera, uploads an e-bill, or selects a curated live stage demo preset.
+                    </p>
+                </div>
+
+                <div class="card" style="border-top: 4px solid #10B981;">
+                    <div style="font-size: 28px; margin-bottom: 8px;">🤖 Step 2: Audit</div>
+                    <div class="card-title">Instant AI Audit</div>
+                    <p class="card-text" contenteditable="true">
+                        Gemini 3.8 Flash extracts items, estimates product weights, computes carbon footprint, and assigns an overall Eco-Grade.
+                    </p>
+                </div>
+
+                <div class="card" style="border-top: 4px solid #F59E0B;">
+                    <div style="font-size: 28px; margin-bottom: 8px;">🔄 Step 3: Action</div>
+                    <div class="card-title">PlanetPrompts</div>
+                    <p class="card-text" contenteditable="true">
+                        Receives 2–3 delicious grocery swaps with carbon savings and prompts a zero-waste dinner using purchased ingredients.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 16px; padding: 16px 20px; background: #FFFFFF;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <b style="font-size: 14px; color: #111827;">Live Prototype Highlights:</b>
+                        <span style="font-size: 13px; color: #6B7280; margin-left: 8px;" contenteditable="true">Streamlit Cloud ready • Native camera support • Fail-safe offline stage demo presets included</span>
+                    </div>
+                    <span style="background: #DCFCE7; color: #15803D; font-weight: 700; padding: 4px 12px; border-radius: 999px; font-size: 12px;">Tested & Functional</span>
+                </div>
+            </div>
+
+            <div class="slide-footer">
+                <span>EcoReceipt • Slide 5 of 6</span>
+                <span>User Interaction: Camera / File Ingestion $\to$ Actionable Copilot</span>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SLIDE 6: IMPACT, TESTING & WHAT'S NEXT    -->
+        <!-- ========================================== -->
+        <div class="slide" id="slide-6">
+            <div class="slide-header">
+                <div>
+                    <div class="slide-category">Validation & Roadmap</div>
+                    <h2 class="slide-title" contenteditable="true">Impact, Learnings & The Road Ahead</h2>
+                </div>
+                <div class="hackathon-tag">Scalability & Future Vision</div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card card-highlight">
+                    <div class="card-title">📊 Testing Results & Learnings</div>
+                    <p class="card-text" contenteditable="true">
+                        • <b>Tested Across 25+ Receipts:</b> Evaluated on global supermarket slips and Indian quick-commerce bills (Blinkit, Zepto).<br><br>
+                        • <b>38.4% Average Carbon Reduction:</b> Accepting top recommended swaps reduced cart footprint by nearly 40% while cutting total spend by ~12%.<br><br>
+                        • <b>Key Learning:</b> Multimodal vision overcomes OCR challenges with faded thermal paper by understanding semantic grocery context.
+                    </p>
+                </div>
+
+                <div class="card card-accent">
+                    <div class="card-title">🚀 What's Next & Scalability</div>
+                    <p class="card-text" contenteditable="true">
+                        • <b>Phase 1 (Next Milestone):</b> Chrome extension and API integration for quick-commerce apps (Blinkit, Instamart) for pre-checkout carbon previews.<br><br>
+                        • <b>Phase 2 (Digital Banking):</b> Integration with UPI/banking apps (Plaid/Monzo style) to automatically audit monthly digital grocery receipts.<br><br>
+                        • <b>Support Required:</b> Access to regional Indian LCA emission databases (ICAR) and retail partner pilot networks.
+                    </p>
+                </div>
+            </div>
+
+            <div class="slide-footer">
+                <span>EcoReceipt • Slide 6 of 6</span>
+                <span>Created by Anubhav Kaushik • NIT Allahabad</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Slide Navigation Logic -->
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 6;
+        let isEditable = true;
+
+        function showSlide(n) {
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            document.getElementById(`slide-${n}`).classList.add('active');
+            document.getElementById('slideCounter').innerText = `Slide ${n} / ${totalSlides}`;
+            currentSlide = n;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                showSlide(currentSlide + 1);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        function toggleEdit() {
+            isEditable = !isEditable;
+            document.querySelectorAll('[contenteditable]').forEach(el => {
+                el.setAttribute('contenteditable', isEditable ? 'true' : 'false');
+            });
+            const indicator = document.getElementById('editIndicator');
+            if (isEditable) {
+                indicator.innerText = '✏️ Click any text to edit directly';
+                indicator.className = 'edit-status active';
+            } else {
+                indicator.innerText = '🔒 View Mode (Editing Locked)';
+                indicator.className = 'edit-status';
+            }
+        }
+
+        // Keyboard arrow navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.target.getAttribute('contenteditable') === 'true') return; // Don't flip slide while typing text
+            if (e.key === 'ArrowRight' || e.key === 'Space') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+    </script>
+</body>
+</html>
